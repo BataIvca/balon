@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloons</title>
+</head>
+<body id="body">
+
+    <canvas id="canvas"></canvas>
+    <button id="lettersBtn">Letters</button>
+    <button id="numbersBtn">Numbers</button>
+
+    <script>
+
+        //VARIABLES
+
+        
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let balloonWidth = 64 * height/1000;
+        let balloonHeight = 125 * height/1000;
+        let balloonWidth1 = 256 * height/1000;
+        let balloonHeight1 = 500 * height/1000;
+        let fireworkWidth = 340 * height/1000;
+        let fireworkHeight = 340 * height/1000;
+        let stop = 0;
+        let started = 0;
+        
+        const fireworks = [];
+        const letters = [];
+        const balloons = [
+            {letter: "a", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 9},   
+            {letter: "b", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 16.9},
+            {letter: "c", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 23.3},
+            {letter: "d", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 29.7},
+            {letter: "e", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 34},
+            {letter: "f", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 42},
+            {letter: "g", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 48.2},
+            {letter: "h", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 52.3},
+            {letter: "i", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 58.8},
+            {letter: "j", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 64.6},
+            {letter: "k", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 70.9},
+            {letter: "l", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 76.9},
+            {letter: "m", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 82.9},
+            {letter: "n", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 89},
+            {letter: "o", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 94.9},
+            {letter: "p", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 100.6},
+            {letter: "q", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 106.6},
+            {letter: "r", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 112.8},
+            {letter: "s", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 119},
+            {letter: "t", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 125.3},
+            {letter: "u", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 131.5},
+            {letter: "v", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 137.2},
+            {letter: "w", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 143.6},
+            {letter: "x", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 151.7},
+            {letter: "y", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 158.4},
+            {letter: "z", x: 0, y: 0, speedX: 0, speedY: 0, img: 0, audio: 164.8}
+        ]; 
+        const balloons1 = [];
+
+        balloons.forEach((element, index) => {
+            balloons[index].x = (balloonWidth/2) + Math.round(Math.random() * (width - balloonWidth));
+            balloons[index].y = (balloonHeight/2) + Math.round(Math.random() * (height - balloonHeight));
+            balloons[index].speedX = Math.round(Math.random() * 10) - 5;
+            balloons[index].speedY = Math.round(Math.random() * 10) - 5;
+            if(element.speedX == 0){ balloons[index].speedX = 2; }
+            if(element.speedY == 0){ balloons[index].speedY = 2; }
+            balloons[index].img = Math.floor(Math.random() * 4);
+        });
+
+        //DOM
+
+        const body = document.getElementById('body');
+        const lettersBtn = document.getElementById('lettersBtn');
+        const numbersBtn = document.getElementById('numbersBtn');
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        body.style.margin = "0px";
+        body.style.overflow = "hidden";
+        body.style.backgroundColor = "#000";
+        
+        lettersBtn.style.position = "absolute";
+        lettersBtn.style.left = "0vw";
+        lettersBtn.style.top = "45vh";
+        lettersBtn.style.zIndex = "2";
+        lettersBtn.style.display = "block";
+        lettersBtn.style.margin = "auto";
+        lettersBtn.style.fontSize = "5vh";
+        lettersBtn.style.background = "#bbf";
+        lettersBtn.style.textAlign = "center";
+        lettersBtn.style.width = "25vh";
+        lettersBtn.style.border = "1vh solid #00F";
+        lettersBtn.style.borderRadius = "5vh 0 5vh 0";
+
+        numbersBtn.style.position = "absolute";
+        numbersBtn.style.right = "0vw";
+        numbersBtn.style.top = "45vh";
+        numbersBtn.style.zIndex = "2";
+        numbersBtn.style.display = "block";
+        numbersBtn.style.margin = "auto";
+        numbersBtn.style.fontSize = "5vh";
+        numbersBtn.style.background = "#FFF";
+        numbersBtn.style.background = "#bbf";
+        numbersBtn.style.textAlign = "center";
+        numbersBtn.style.width = "25vh";
+        numbersBtn.style.border = "1vh solid #00F";
+        numbersBtn.style.borderRadius = "0 5vh 0 5vh";
+        
+
+        
+
+        //ASSETS
+
+        const starsImg = document.createElement('img');
+        starsImg.setAttribute('src', 'stars.jpg');
+        const balloonImg = document.createElement('img');
+        balloonImg.setAttribute('src', 'balloons.png');
+        const fireworkImg = document.createElement('img');
+        fireworkImg.setAttribute('src', 'Firework.png');
+        const alphabet = document.createElement('audio');
+        alphabet.setAttribute('src', 'Alphabet.m4a');
+
+        //INTERVAL CANVAS
+
+        setInterval(() => {
+            ctx.fillStyle = "#000";
+            ctx.drawImage(starsImg, 0, 0, width, height);
+            
+            if(started != 0){
+                balloons.forEach((element, index) => {
+                    ctx.drawImage(balloonImg, balloons[index].img * 256, 0, 256, 500, 
+                    element.x - balloonWidth/2, element.y - balloonHeight/2, balloonWidth, balloonHeight);
+                });
+                balloons1.forEach((element, index) => {
+                    ctx.drawImage(balloonImg, balloons1[index].img * 256, 0, 256, 500, 
+                    element.x - balloonWidth1/2, element.y - balloonHeight1/2, balloonWidth1, balloonHeight1);
+                    ctx.font = ctx.font = `bold ${70 * height/1000}px sans-serif`;
+                    ctx.textAlign = "center";
+                    if(element.letter){
+                        ctx.fillText(element.letter.toUpperCase(), element.x - balloonWidth1/7.8, element.y - balloonHeight1/4);
+                    }
+                });
+                
+                fireworks.forEach((element, index) => {
+                    ctx.drawImage(fireworkImg, element.x1, element.y1, 256, 256, element.x, element.y, fireworkWidth, fireworkHeight);
+                });
+
+                letters.forEach((element, index) => {
+                    ctx.fillStyle = "#fff";
+                    ctx.font = `bold ${element.dimension * height/1000}px sans-serif`;
+                    ctx.textAlign = "center";
+                    ctx.fillText(element.letter.toUpperCase(), element.x - balloonWidth1/7.8, element.y - balloonHeight1/4);
+                });
+            }
+        }, 1000/60);
+
+        //BALLOONS MOVEMENTS
+
+        function moveBalloon(){
+            balloons.forEach((element, index) => {
+                let maxX = width - balloonWidth/4;
+                let minX = balloonWidth/2;
+                let maxY = height + balloonHeight/20;
+                let minY = balloonHeight/2;
+                if(balloons[index].x >= maxX){ balloons[index].speedX = -Math.abs(balloons[index].speedX); }
+                if(balloons[index].x <= minX){ balloons[index].speedX = Math.abs(balloons[index].speedX); }
+                if(balloons[index].y >= maxY){ balloons[index].speedY = -Math.abs(balloons[index].speedY); }
+                if(balloons[index].y <= minY){ balloons[index].speedY = Math.abs(balloons[index].speedY); }
+                balloons[index].x = balloons[index].x + balloons[index].speedX;
+                balloons[index].y = balloons[index].y + balloons[index].speedY;
+            });
+
+            if(balloons1.length < 5){ 
+                if(balloons[0]){ balloons1.push(balloons[0]); } 
+                if(balloons[0]){ balloons.splice(0, 1); } 
+            }
+
+            balloons1.forEach((element, index) => {
+                let maxX = width - balloonWidth1/4;
+                let minX = balloonWidth1/2;
+                let maxY = height + balloonHeight1/20;
+                let minY = balloonHeight1/2;
+                if(balloons1[index].x >= maxX){ balloons1[index].speedX = -Math.abs(balloons1[index].speedX); }
+                if(balloons1[index].x <= minX){ balloons1[index].speedX = Math.abs(balloons1[index].speedX); }
+                if(balloons1[index].y >= maxY){ balloons1[index].speedY = -Math.abs(balloons1[index].speedY); }
+                if(balloons1[index].y <= minY){ balloons1[index].speedY = Math.abs(balloons1[index].speedY); }
+
+
+                balloons1.forEach((element1, index1) => {
+                    if(element.letter != element1.letter){
+                        let result1 = (balloonWidth1/2.7) * 2;
+                        let result2 = (balloonWidth1/2.7) + balloonWidth1/3.1;
+                        let result3 = (balloonWidth1/2.7) + balloonWidth1/4.9;
+                        let pitagora1 =  Math.sqrt((Math.abs((element.x - balloonWidth1/7.8) - (element1.x - balloonWidth1/7.8))) ** 2 + 
+                            (Math.abs((element.y - balloonHeight1/3.3) - (element1.y - balloonHeight1/3.3))) ** 2 );
+                        let pitagora2 =  Math.sqrt((Math.abs((element.x - balloonWidth1/7.8) - (element1.x - balloonWidth1/7.8))) ** 2 + 
+                            (Math.abs((element.y - balloonHeight1/3.3) - (element1.y - balloonHeight1/4))) ** 2 );
+                        let pitagora3 =  Math.sqrt((Math.abs((element.x - balloonWidth1/7.8) - (element1.x - balloonWidth1/7.8))) ** 2 + 
+                            (Math.abs((element.y - balloonHeight1/3.3) - (element1.y - balloonHeight1/6))) ** 2 );
+                        if(result1 >= pitagora1 || result2 >= pitagora2 || result3 >= pitagora3){ 
+                            let ax = balloons1[index].speedX;
+                            let bx = balloons1[index1].speedX;
+                            let ay = balloons1[index].speedY;
+                            let by = balloons1[index1].speedY;
+                            if(element.x >= element1.x){ balloons1[index].speedX = Math.abs(bx); }
+                            else if(element.x < element1.x){ balloons1[index].speedX = -Math.abs(bx); }
+                            if(element1.x >= element.x){ balloons1[index1].speedX = Math.abs(ax); }
+                            else if(element1.x < element.x){ balloons1[index1].speedX = -Math.abs(ax); }
+                            if(element.y >= element1.y){ balloons1[index].speedY = Math.abs(by); }
+                            else if(element.y < element1.y){ balloons1[index].speedY = -Math.abs(by); }
+                            if(element1.y >= element.y){ balloons1[index1].speedY = Math.abs(ay); }
+                            else if(element1.y < element.y){ balloons1[index1].speedY = -Math.abs(ay); }
+                        }
+                    }
+                });
+
+                balloons1[index].x = balloons1[index].x + balloons1[index].speedX;
+                balloons1[index].y = balloons1[index].y + balloons1[index].speedY;
+            });
+        }
+
+
+        //EXPLOSION
+
+        function addFirework(x, y){
+            fireworks.push({x: x, y: y, x1: 0, y1: 0});
+        }
+
+        function addLetter(x, y, letter){
+            letters.push({x: x, y: y, letter: letter, dimension: 70});
+        }
+
+        //INTERVAL OF CHANGE
+        setInterval(() => {
+            fireworks.forEach((element, index) => {
+                if(fireworks[index].x1 < 1280){
+                    fireworks[index].x1 = fireworks[index].x1 + 256;
+                }else{
+                    fireworks[index].x1 = 0;
+                }
+
+                if(fireworks[index].y1 < 1024 && fireworks[index].x1 == 1280){
+                    fireworks[index].y1 = fireworks[index].y1 + 256;
+                }else if(fireworks[index].x1 == 1280 && fireworks[index].y1 == 1024){
+                    fireworks.splice(fireworks[index], 1);
+                }
+
+            });
+
+            letters.forEach((element, index) => { 
+                letters[index].dimension = element.dimension + 2;
+                if(element.dimension > 200){ letters.splice(index, 1); }
+            });
+
+            moveBalloon();
+        }, 30);
+
+        //EVENTS
+        canvas.addEventListener('pointerdown', (e) => {
+            if(started == 1){
+                balloons1.forEach((element, index) => {
+                    let result1 = balloonWidth1/2.7;
+                    let result2 = balloonWidth1/3.1;
+                    let result3 = balloonWidth1/4.9;
+                    let pitagora1 =  Math.sqrt((Math.abs((e.offsetX) - (element.x - balloonWidth1/7.8))) ** 2 + 
+                        (Math.abs((e.offsetY) - (element.y - balloonHeight1/3.3))) ** 2 );
+                    let pitagora2 =  Math.sqrt((Math.abs((e.offsetX) - (element.x - balloonWidth1/7.8))) ** 2 + 
+                        (Math.abs((e.offsetY) - (element.y - balloonHeight1/4))) ** 2 );
+                    let pitagora3 =  Math.sqrt((Math.abs((e.offsetX) - (element.x - balloonWidth1/7.8))) ** 2 + 
+                        (Math.abs((e.offsetY) - (element.y - balloonHeight1/6))) ** 2 );
+                    if(result1 >= pitagora1 || result2 >= pitagora2 || result3 >= pitagora3){
+                        if(stop == 0){
+                            stop = 1;
+                            addFirework(e.offsetX-fireworkWidth/2, e.offsetY-fireworkHeight/2);
+                            addLetter(element.x, element.y, element.letter);
+                            alphabet.currentTime = element.audio;
+                            alphabet.play();
+                            balloons1.splice(index, 1);
+                            setTimeout(() => { stop = 0; alphabet.pause(); }, 1200);
+                        }
+                    } 
+                });
+            }
+        });
+
+        window.addEventListener('resize', (e) => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            balloonWidth = 64 * height/1000;
+            balloonHeight = 125 * height/1000;
+            balloonWidth1 = 256 * height/1000;
+            balloonHeight1 = 500 * height/1000;
+            fireworkWidth = 256 * height/1000;
+            fireworkHeight = 256 * height/1000;
+            canvas.width = width;
+            canvas.height = height;
+        });
+
+        lettersBtn.addEventListener('pointerdown', (e) => {
+            numbersBtn.style.display = "none";
+            lettersBtn.style.display = "none";
+            started = 1;
+        });
+
+        numbersBtn.addEventListener('pointerdown', (e) => {
+            numbersBtn.style.display = "none";
+            lettersBtn.style.display = "none";
+            alphabet.setAttribute('src', 'Numbers.m4a');
+            started = 1;
+
+            balloons.forEach((element, index) => {
+                if(element.letter == "a"){ balloons[index].letter = "1"; balloons[index].audio = 11; }
+                if(element.letter == "b"){ balloons[index].letter = "2"; balloons[index].audio = 14.8; }
+                if(element.letter == "c"){ balloons[index].letter = "3"; balloons[index].audio = 18.7; }
+                if(element.letter == "d"){ balloons[index].letter = "4"; balloons[index].audio = 22.7; }
+                if(element.letter == "e"){ balloons[index].letter = "5"; balloons[index].audio = 26.4; }
+                if(element.letter == "f"){ balloons[index].letter = "6"; balloons[index].audio = 30.7; }
+                if(element.letter == "g"){ balloons[index].letter = "7"; balloons[index].audio = 35; }
+                if(element.letter == "h"){ balloons[index].letter = "8"; balloons[index].audio = 39.5; }
+                if(element.letter == "i"){ balloons[index].letter = "9"; balloons[index].audio = 43.1; }
+                if(element.letter == "j"){ balloons[index].letter = "10"; balloons[index].audio = 47.3; }
+
+                if(element.letter == "k"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "l"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "m"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "n"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "o"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "p"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "q"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "r"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "s"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "t"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "u"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "v"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "w"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "x"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "y"){ balloons.splice(index, 1, {}); }
+                if(element.letter == "z"){ balloons.splice(index, 1, {}); }
+            });
+
+            balloons1.forEach((element, index) => {
+                if(element.letter == "a"){ balloons1[index].letter = "1"; balloons1[index].audio = 11; }
+                if(element.letter == "b"){ balloons1[index].letter = "2"; balloons1[index].audio = 14.8; }
+                if(element.letter == "c"){ balloons1[index].letter = "3"; balloons1[index].audio = 18.7; }
+                if(element.letter == "d"){ balloons1[index].letter = "4"; balloons1[index].audio = 22.7; }
+                if(element.letter == "e"){ balloons1[index].letter = "5"; balloons1[index].audio = 26.4; }
+                if(element.letter == "f"){ balloons1[index].letter = "6"; balloons1[index].audio = 30.7; }
+                if(element.letter == "g"){ balloons1[index].letter = "7"; balloons1[index].audio = 35; }
+                if(element.letter == "h"){ balloons1[index].letter = "8"; balloons1[index].audio = 39.5; }
+                if(element.letter == "i"){ balloons1[index].letter = "9"; balloons1[index].audio = 43.1; }
+                if(element.letter == "j"){ balloons1[index].letter = "10"; balloons1[index].audio = 47.3; }
+            });
+        });
+        
+    </script>
+    
+</body>
+</html>
